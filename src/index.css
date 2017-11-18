@@ -16,3 +16,8 @@ body {
   overflow-y: hidden;
   overflow-x: scroll;
 }
+
+.app-content {
+  padding: 2rem;
+  flex: 1;
+}

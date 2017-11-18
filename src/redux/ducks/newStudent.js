@@ -2,49 +2,48 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/mergeMap';
+import { push } from 'react-router-redux';
 
 // Actions
-const FETCH = 'students/START_FETCH';
-const FETCH_SUCCESS = 'students/FETCH_SUCCESS';
-const FETCH_ERROR = 'students/FETCH_ERROR';
+const CREATE = 'students/START_CREATE';
+const CREATE_SUCCESS = 'students/CREATE_SUCCESS';
+const CREATE_ERROR = 'students/CREATE_ERROR';
 
 // Helpers
-const onFetch = state => (
+const onCreate = (state, action) => (
   {
     ...state,
-    fetching: true,
+    sending: true,
   }
 );
 
-const onFetchSuccess = (state, action) => (
+const onCreateSuccess = (state, action) => (
   {
     ...state,
-    data: action.data,
-    fetching: false,
+    sending: false,
   }
 );
 
-const onFetchError = (state, action) => (
+const onCreateError = (state, action) => (
   {
     ...state,
-    fetching: false,
+    sending: false,
     error: action.error,
   }
 );
 
 // Reducer
 
-export default function reducer(state = { fetching: true }, action) {
+export default function reducer(state = { sending: false }, action) {
   switch (action.type) {
-    case FETCH:
-      return onFetch(state, action);
-    case FETCH_SUCCESS:
-      return onFetchSuccess(state, action);
-    case FETCH_ERROR:
-      return onFetchError(state, action);
+    case CREATE:
+      return onCreate(state, action);
+    case CREATE_SUCCESS:
+      return onCreateSuccess(state, action);
+    case CREATE_ERROR:
+      return onCreateError(state, action);
     default:
       return state;
   }
@@ -52,22 +51,22 @@ export default function reducer(state = { fetching: true }, action) {
 
 // Action creators
 
-export const fetchStudents = () => (
+export const createStudent = data => (
   {
-    type: FETCH,
+    type: CREATE,
+    payload: data,
   }
 );
 
-export const fetchStudentsSuccess = data => (
+export const createStudentSuccess = () => (
   {
-    type: FETCH_SUCCESS,
-    data,
+    type: CREATE_SUCCESS,
   }
 );
 
-export const fetchStudentsError = error => (
+export const createStudentError = error => (
   {
-    type: FETCH_ERROR,
+    type: CREATE_ERROR,
     error,
   }
 );
@@ -80,22 +79,24 @@ const rootUrl = process.env.REACT_APP_API_BASE_URL;
 // `action$` es una convención de `redux-observable`, que se debe leer como "actions":
 export const epic = (action$) => {
   // `action$` es un Observable, que permite filtrar por nombre de acción utilizando el método `ofType`.
-  return action$.ofType(FETCH)
+  return action$.ofType(CREATE)
     .delay(1000)
-    .mergeMap(() => { // mergeMap es una función que toma un callback como parámetro. Este callback debe devolver un observable de RxJS. En este caso, se retorna `Observable.fromPromise()`.
+    .mergeMap((action) => { // mergeMap es una función que toma un callback como parámetro. Este callback debe devolver un observable de RxJS. En este caso, se retorna `Observable.fromPromise()`.
       const promise = fetch(`${rootUrl}/students`, {
         mode: 'cors',
+        method: 'POST',
         headers: new Headers({
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         }),
+        body: JSON.stringify({ student: action.payload }),
       }).then(response => response.json());
 
       return Observable.fromPromise(promise)
-        .map(data => fetchStudentsSuccess(data))
+        .flatMap(data => [createStudentSuccess(data), push('/students')])
         .catch((error) => {
           console.error(error);
-          return Observable.of(fetchStudentsError(error));
+          return Observable.of(createStudentError(error));
         });
     });
 };
