@@ -15,3 +15,4 @@ Basado en [`create-react-app`](https://github.com/facebookincubator/create-react
 
 * https://hackernoon.com/the-coolest-react-ui-frameworks-for-your-new-react-app-ad699fffd651
 * http://reactivex.io/rxjs/
+* https://reacttraining.com/react-router/web/example/auth-workflow
