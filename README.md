@@ -10,3 +10,8 @@ Basado en [`create-react-app`](https://github.com/facebookincubator/create-react
 * `react-router`
 * `redux-observable`
 * `material-ui`
+
+## Links
+
+* https://hackernoon.com/the-coolest-react-ui-frameworks-for-your-new-react-app-ad699fffd651
+* http://reactivex.io/rxjs/

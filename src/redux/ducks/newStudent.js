@@ -39,6 +39,10 @@ const onCreateError = (state, action) => (
 export default function reducer(state = { sending: false }, action) {
   switch (action.type) {
     case CREATE:
+      // return {
+      //   ...state,
+      //   sending: true,
+      // };
       return onCreate(state, action);
     case CREATE_SUCCESS:
       return onCreateSuccess(state, action);
@@ -80,7 +84,7 @@ const rootUrl = process.env.REACT_APP_API_BASE_URL;
 export const epic = (action$) => {
   // `action$` es un Observable, que permite filtrar por nombre de acción utilizando el método `ofType`.
   return action$.ofType(CREATE)
-    .delay(1000)
+    // .delay(1000)
     .mergeMap((action) => { // mergeMap es una función que toma un callback como parámetro. Este callback debe devolver un observable de RxJS. En este caso, se retorna `Observable.fromPromise()`.
       const promise = fetch(`${rootUrl}/students`, {
         mode: 'cors',
